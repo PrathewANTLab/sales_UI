@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Altius — Sales Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF5EC;--cream-2:#F3EADA;--paper:#FFFDF8;
+  --espresso:#241A13;--espresso-2:#2F241B;
+  --tang:#F4622E;--amber:#F2A33D;--emerald:#1E7A55;--emerald-soft:#E3F1E9;--rose:#D9456B;
+  --ink:#2A211A;--muted:#8C7C6C;--line:#E7DBC8;--line-dark:#3C2F24;
+  --shadow:0 1px 2px rgba(60,40,20,.05),0 8px 24px rgba(110,70,30,.07);
+  --shadow-lg:0 6px 16px rgba(60,40,20,.08),0 28px 64px rgba(110,70,30,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Hanken Grotesk',sans-serif;background:var(--cream);color:var(--ink);
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(120,80,40,.045) 1px, transparent 0),
+    radial-gradient(1200px 500px at 80% -5%, rgba(244,98,46,.08), transparent),
+    radial-gradient(900px 500px at -5% 10%, rgba(242,163,61,.07), transparent);
+  background-size:22px 22px, 100% 100%, 100% 100%;
+}
+::selection{background:var(--tang);color:#fff}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 26px 60px}
+
+/* ---------- FLOATING HEADER ---------- */
+.bar{
+  display:flex;align-items:center;gap:18px;background:var(--paper);
+  border:1px solid var(--line);border-radius:18px;padding:12px 16px;
+  box-shadow:var(--shadow-lg);position:sticky;top:18px;z-index:50;
+}
+.brand{display:flex;align-items:center;gap:11px;padding-right:4px}
+.brand .mark{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--tang),var(--amber));display:grid;place-items:center;
+  font-family:'Bricolage Grotesque';font-weight:800;color:#fff;font-size:20px;
+  box-shadow:0 5px 16px rgba(244,98,46,.45);
+}
+.brand h1{font-family:'Bricolage Grotesque';font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.brand span{font-size:10.5px;color:var(--tang);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.cmd{
+  flex:1;display:flex;align-items:center;gap:10px;background:var(--cream);
+  border:1px solid var(--line);border-radius:12px;padding:11px 15px;color:var(--muted);
+  font-size:13.5px;cursor:text;transition:.2s;
+}
+.cmd:hover{border-color:var(--tang);background:var(--paper)}
+.cmd svg{width:16px;height:16px}
+.cmd .k{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--tang);background:rgba(244,98,46,.1);padding:3px 9px;border-radius:7px}
+.tb{display:flex;align-items:center;gap:9px}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--cream);display:grid;place-items:center;cursor:pointer;transition:.18s;position:relative}
+.icon-btn:hover{border-color:var(--tang);transform:translateY(-1px)}
+.icon-btn svg{width:18px;height:18px;stroke:var(--ink)}
+.icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;background:var(--tang);border-radius:50%;border:2px solid var(--cream)}
+.av{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--emerald),#2FA06E);display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px;cursor:pointer}
+
+/* ---------- CONTROL DECK (horizontal pill nav) ---------- */
+.deck{display:flex;gap:8px;margin:16px 0 26px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.deck::-webkit-scrollbar{display:none}
+.pill{
+  display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:13px;
+  background:var(--paper);border:1px solid var(--line);cursor:pointer;white-space:nowrap;
+  font-size:13px;font-weight:600;color:var(--ink);transition:.18s;flex-shrink:0;box-shadow:var(--shadow)
+}
+.pill svg{width:16px;height:16px;opacity:.8}
+.pill:hover{transform:translateY(-2px);border-color:var(--tang)}
+.pill.active{background:var(--espresso);color:#fff;border-color:var(--espresso)}
+.pill.active svg{stroke:var(--amber);opacity:1}
+.pill .n{font-family:'Space Mono';font-size:10px;color:var(--muted)}
+.pill.active .n{color:var(--amber)}
+
+/* ---------- VIEWS ---------- */
+.view{display:none;animation:fade .5s ease both}
+.view.show{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.greet{margin-bottom:22px}
+.greet .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tang);font-weight:700;margin-bottom:8px}
+.greet h2{font-family:'Bricolage Grotesque';font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.02}
+.greet h2 em{font-style:normal;color:var(--tang)}
+.greet p{color:var(--muted);font-size:15px;margin-top:8px;max-width:600px}
+
+/* ---------- BENTO LAUNCHPAD ---------- */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;grid-auto-rows:minmax(120px,auto)}
+.tile{
+  background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:22px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;animation:pop .5s ease both;
+  transition:.22s;
+}
+.tile.click{cursor:pointer}
+.tile.click:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--tang)}
+.tile .arrow{position:absolute;top:20px;right:20px;width:30px;height:30px;border-radius:9px;background:var(--cream);display:grid;place-items:center;transition:.2s}
+.tile.click:hover .arrow{background:var(--tang)}
+.tile.click:hover .arrow svg{stroke:#fff}
+.tile .arrow svg{width:15px;height:15px;stroke:var(--ink);transition:.2s}
+.tile .mod-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:16px}
+.tile .mod-ic svg{width:21px;height:21px}
+.tile h3{font-family:'Bricolage Grotesque';font-size:18px;font-weight:600;letter-spacing:-.01em}
+.tile .tag-n{font-family:'Space Mono';font-size:11px;color:var(--tang);font-weight:700}
+.tile p{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:6px}
+
+/* hero greeting tile spanning */
+.t-hero{grid-column:span 4;grid-row:span 1;background:linear-gradient(125deg,var(--espresso),var(--espresso-2));color:#F1E7DA;display:flex;flex-direction:column;justify-content:space-between}
+.t-hero .stat-row{display:flex;gap:30px;margin-top:18px}
+.t-hero .stat b{font-family:'Bricolage Grotesque';font-size:30px;display:block;line-height:1;color:#fff}
+.t-hero .stat small{font-size:11.5px;color:#B49C84}
+.t-hero .stat .up{color:#5FCB95;font-weight:700;font-size:11px}
+.t-hero .glow{position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(244,98,46,.5),transparent 70%);top:-90px;right:-60px;filter:blur(10px)}
+.t-hero h3{font-family:'Bricolage Grotesque';font-size:21px;color:#fff;position:relative}
+.t-hero .sub{color:#C9B69F;font-size:13px;margin-top:4px;position:relative}
+
+.t-insight{grid-column:span 2;background:linear-gradient(135deg,rgba(244,98,46,.1),rgba(242,163,61,.06));border-color:rgba(244,98,46,.22)}
+.t-insight .spark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--tang),var(--amber));display:grid;place-items:center;margin-bottom:13px;box-shadow:0 5px 14px rgba(244,98,46,.4)}
+.t-insight .spark svg{width:17px;height:17px;stroke:#fff}
+.t-insight b{font-size:13.5px;display:block;line-height:1.35}
+.t-insight p{font-size:12px;margin-top:6px}
+
+.t-chart{grid-column:span 3}
+.t-mod{grid-column:span 3}
+.t-wide{grid-column:span 6}
+
+.m-tang .mod-ic{background:rgba(244,98,46,.12);color:var(--tang)}
+.m-emer .mod-ic{background:var(--emerald-soft);color:var(--emerald)}
+.m-amber .mod-ic{background:rgba(242,163,61,.16);color:#C97E16}
+.m-rose .mod-ic{background:rgba(217,69,107,.12);color:var(--rose)}
+.m-esp .mod-ic{background:#EFE6D6;color:var(--espresso)}
+
+/* mini chart in tile */
+.spark-bars{display:flex;align-items:flex-end;gap:6px;height:60px;margin-top:14px}
+.spark-bars i{flex:1;background:linear-gradient(180deg,var(--tang),var(--amber));border-radius:4px 4px 0 0;animation:grow .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{height:0!important}}
+
+/* module preview chips */
+.prev{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.prev span{font-size:10.5px;background:var(--cream);border:1px solid var(--line);padding:4px 9px;border-radius:7px;color:var(--muted);font-weight:600}
+
+/* ---------- shared inner components ---------- */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.page-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.page-head .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tang);font-weight:700;margin-bottom:8px}
+.page-head h2{font-family:'Bricolage Grotesque';font-size:29px;font-weight:700;letter-spacing:-.025em;line-height:1.05}
+.page-head p{color:var(--muted);font-size:14px;margin-top:7px;max-width:560px}
+.btn{font-family:inherit;font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:11px;border:none;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--tang);color:#fff;box-shadow:0 4px 12px rgba(244,98,46,.32)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(244,98,46,.42)}
+.btn-ghost{background:var(--paper);border:1px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--tang);color:var(--tang)}
+.btn-back{background:none;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:7px 12px;font-weight:600;cursor:pointer;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:12.5px}
+.btn-back:hover{border-color:var(--tang);color:var(--tang)}
+
+/* PRODUCT LOOKUP */
+.chat-wrap{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+.chat{padding:0;overflow:hidden;display:flex;flex-direction:column;min-height:440px}
+.chat-body{flex:1;padding:22px}
+.msg{margin-bottom:18px;animation:pop .4s ease both}
+.msg.rep{text-align:right}
+.bubble{display:inline-block;max-width:80%;padding:11px 15px;border-radius:14px;font-size:13.5px;line-height:1.5;text-align:left}
+.msg.rep .bubble{background:var(--espresso);color:#F1E7DA;border-bottom-right-radius:4px}
+.msg.ai .bubble{background:var(--cream-2);border-bottom-left-radius:4px}
+.msg .who{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:600}
+.spec{margin-top:12px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);max-width:520px;box-shadow:var(--shadow)}
+.spec-top{display:flex;gap:14px;padding:16px}
+.spec-img{width:84px;height:84px;border-radius:11px;background:linear-gradient(135deg,var(--cream-2),#E6D4BC);flex-shrink:0;display:grid;place-items:center;border:1px solid var(--line)}
+.spec-img svg{width:38px;height:38px;opacity:.5}
+.spec h4{font-family:'Bricolage Grotesque';font-size:17px;font-weight:700}
+.spec .sku{font-family:'Space Mono';font-size:12px;color:var(--tang);font-weight:700;margin:2px 0 8px}
+.tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:6px;background:var(--emerald-soft);color:var(--emerald);font-weight:600;margin:2px 4px 2px 0}
+.tag.iso{background:rgba(242,163,61,.16);color:#B5740F}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.spec-grid div{padding:10px 16px;font-size:12.5px;border-bottom:1px solid var(--line)}
+.spec-grid div:nth-child(odd){border-right:1px solid var(--line)}
+.spec-grid b{color:var(--muted);font-weight:500;display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.spec-foot{padding:13px 16px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);background:var(--cream)}
+.chat-input{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;background:var(--paper)}
+.chat-input input{flex:1;border:1px solid var(--line);border-radius:11px;padding:12px 15px;font-family:inherit;font-size:13.5px;background:var(--cream);outline:none}
+.chat-input input:focus{border-color:var(--tang);background:var(--paper)}
+.side-card{padding:18px}
+.side-card h3{font-family:'Bricolage Grotesque';font-size:15px;margin-bottom:13px}
+.quick{display:flex;flex-direction:column;gap:8px}
+.quick button{text-align:left;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:var(--cream);font-family:'Space Mono';font-size:12px;color:var(--ink);cursor:pointer;transition:.18s}
+.quick button:hover{border-color:var(--tang);background:rgba(244,98,46,.05);color:var(--tang)}
+.latency{display:flex;align-items:center;gap:8px;margin-top:16px;padding:11px;border-radius:10px;background:var(--emerald-soft);font-size:12px;color:var(--emerald);font-weight:600}
+
+/* TABLE */
+.searchbar{display:flex;gap:10px;margin-bottom:20px}
+.searchbar input{flex:1;border:1px solid var(--line);border-radius:12px;padding:13px 16px;font-family:inherit;font-size:14px;background:var(--paper);outline:none;box-shadow:var(--shadow)}
+.searchbar input:focus{border-color:var(--tang)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+.tbl{padding:6px;overflow:hidden}
+thead th{text-align:left;padding:13px 16px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;border-bottom:1px solid var(--line)}
+tbody td{padding:14px 16px;border-bottom:1px solid var(--line)}
+tbody tr{transition:.15s}
+tbody tr:hover{background:var(--cream)}
+tbody tr:last-child td{border-bottom:0}
+.co{display:flex;align-items:center;gap:11px}
+.co .logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:700;color:#fff;font-family:'Bricolage Grotesque';font-size:14px;flex-shrink:0}
+.co b{font-size:13.5px}.co small{color:var(--muted);font-size:11.5px}
+.score .ring{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:11px;color:#fff;font-weight:700}
+.opp{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+.opp.high{background:var(--emerald-soft);color:var(--emerald)}
+.opp.med{background:rgba(242,163,61,.16);color:#B5740F}
+
+/* AUDIT */
+.audit-grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+.gauge-card{padding:26px;text-align:center}
+.gauge{width:170px;height:170px;margin:0 auto 8px;position:relative}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .num{position:absolute;inset:0;display:grid;place-items:center}
+.gauge .num b{font-family:'Bricolage Grotesque';font-size:44px;font-weight:700;line-height:.8}
+.gauge .num small{color:var(--muted);font-size:12px;display:block;margin-top:4px}
+.gap-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.gap-row:last-child{border-bottom:0}
+.gap-row .gi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;font-weight:700}
+.gap-row .gt{flex:1}.gap-row .gt b{font-size:13.5px;display:block}.gap-row .gt small{color:var(--muted);font-size:12px}
+.gbar{width:110px;height:7px;border-radius:10px;background:var(--cream-2);overflow:hidden;flex-shrink:0}
+.gbar i{display:block;height:100%;border-radius:10px}
+.gpct{font-family:'Space Mono';font-size:13px;font-weight:700;width:46px;text-align:right}
+
+/* COMPETITOR */
+.alert{display:flex;gap:14px;padding:18px;border-radius:16px;border:1px solid var(--line);margin-bottom:14px;background:var(--paper);box-shadow:var(--shadow);animation:pop .4s ease both}
+.alert.hot{border-left:4px solid var(--tang)}
+.alert .al-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;font-family:'Bricolage Grotesque';font-weight:700;color:#fff}
+.alert .al-body{flex:1}
+.alert .meta{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.alert .meta b{font-size:14px}
+.alert .meta .when{margin-left:auto;font-size:11px;color:var(--muted)}
+.alert p{font-size:13px;line-height:1.5}
+.diff{margin-top:10px;font-family:'Space Mono';font-size:12px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.diff div{padding:6px 12px}
+.diff .add{background:var(--emerald-soft);color:var(--emerald)}
+.diff .ctx{background:var(--cream);color:var(--muted)}
+.chip-flag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(244,98,46,.12);color:var(--tang)}
+
+/* PLACEHOLDER */
+.soon-wrap{display:grid;place-items:center;min-height:50vh;text-align:center}
+.soon-card{max-width:440px;padding:40px}
+.soon-card .big{width:64px;height:64px;border-radius:18px;margin:0 auto 20px;display:grid;place-items:center;background:linear-gradient(135deg,var(--tang),var(--amber));box-shadow:0 10px 30px rgba(244,98,46,.35)}
+.soon-card .big svg{width:30px;height:30px;stroke:#fff}
+.soon-card h3{font-family:'Bricolage Grotesque';font-size:24px;margin-bottom:10px}
+.soon-card p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px}
+.pill-tag{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--amber);border:1px solid var(--amber);padding:5px 14px;border-radius:20px;margin-bottom:18px}
+
+/* ---------- VOICE COCKPIT ---------- */
+.voice-grid{display:grid;grid-template-columns:1fr 330px;gap:18px;align-items:start}
+.calltypes{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.ct{flex:1;min-width:150px;border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--paper);cursor:pointer;transition:.18s;box-shadow:var(--shadow)}
+.ct:hover{transform:translateY(-2px);border-color:var(--tang)}
+.ct.on{border-color:var(--tang);background:rgba(244,98,46,.05)}
+.ct .ct-ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;margin-bottom:10px}
+.ct .ct-ic svg{width:16px;height:16px}
+.ct b{font-size:13.5px;display:block}
+.ct small{font-size:11.5px;color:var(--muted)}
+.stage{padding:0;overflow:hidden}
+.stage-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--cream)}
+.live-dot{width:9px;height:9px;border-radius:50%;background:var(--tang);box-shadow:0 0 0 0 rgba(244,98,46,.6);animation:ping 1.6s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(244,98,46,.5)}70%{box-shadow:0 0 0 8px rgba(244,98,46,0)}100%{box-shadow:0 0 0 0 rgba(244,98,46,0)}}
+.stage-head .cn b{font-size:15px;font-family:'Bricolage Grotesque'}
+.stage-head .cn small{font-size:11.5px;color:var(--muted);display:block}
+.stage-head .timer{margin-left:auto;font-family:'Space Mono';font-size:14px;font-weight:700;color:var(--tang)}
+.lang-pill{font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;background:var(--espresso);color:#F1E7DA;display:flex;align-items:center;gap:6px}
+.lang-pill .sw{color:var(--amber)}
+.wave{display:flex;align-items:center;gap:3px;height:34px;padding:0 20px;border-bottom:1px solid var(--line);background:var(--paper)}
+.wave i{width:3px;background:var(--tang);border-radius:3px;animation:wv 1s ease-in-out infinite}
+@keyframes wv{0%,100%{height:6px}50%{height:26px}}
+.transcript{padding:18px 20px;max-height:320px;overflow-y:auto}
+.turn{margin-bottom:14px;animation:pop .35s ease both}
+.turn .lbl{font-size:11px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.turn.cust .lbl{color:var(--espresso)}.turn.rep .lbl{color:var(--emerald)}
+.turn .txt{font-size:13.5px;line-height:1.5;background:var(--cream-2);border-radius:12px;padding:10px 14px;display:inline-block;max-width:88%}
+.turn.rep .txt{background:var(--emerald-soft)}
+.ai-surface{margin-top:8px;border:1px dashed var(--tang);border-radius:12px;padding:11px 14px;background:rgba(244,98,46,.05);font-size:12.5px;display:flex;gap:10px;align-items:flex-start}
+.ai-surface .s2{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--tang),var(--amber));display:grid;place-items:center;flex-shrink:0}
+.ai-surface .s2 svg{width:14px;height:14px;stroke:#fff}
+.ai-surface b{color:var(--tang)}
+.stage-foot{display:flex;align-items:center;gap:8px;padding:13px 20px;border-top:1px solid var(--line);background:var(--cream);flex-wrap:wrap}
+.stack-badge{font-size:10.5px;font-family:'Space Mono';color:var(--muted);background:var(--paper);border:1px solid var(--line);padding:4px 9px;border-radius:7px}
+.field{padding:11px 0;border-bottom:1px solid var(--line)}
+.field:last-child{border-bottom:0}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;display:block;margin-bottom:3px}
+.field b{font-size:13.5px}
+.field .dealbar{height:6px;border-radius:6px;background:var(--cream-2);margin-top:6px;overflow:hidden}
+.field .dealbar i{display:block;height:100%;background:linear-gradient(90deg,var(--tang),var(--amber));border-radius:6px}
+.nextline{background:linear-gradient(135deg,rgba(244,98,46,.09),rgba(242,163,61,.05));border:1px solid rgba(244,98,46,.2);border-radius:13px;padding:14px;margin-top:14px}
+.nextline .h{font-size:11px;font-weight:700;color:var(--tang);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.nextline p{font-size:13px;line-height:1.5;font-style:italic}
+
+/* ---------- MEETING INTEL ---------- */
+.connect-row{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.acc{display:flex;align-items:center;gap:11px;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:12px 15px;box-shadow:var(--shadow)}
+.acc .glyph{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:800;color:#fff;font-family:'Bricolage Grotesque';font-size:15px}
+.acc b{font-size:13px;display:block}.acc small{font-size:11px;color:var(--emerald);font-weight:600}
+.acc small.off{color:var(--muted)}
+.toggle{margin-left:auto;width:42px;height:24px;border-radius:20px;background:var(--emerald);position:relative;cursor:pointer;flex-shrink:0}
+.toggle.off{background:var(--cream-2)}
+.toggle i{position:absolute;top:3px;left:21px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.off i{left:3px}
+.mtg{display:flex;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+.mtg:last-child{border-bottom:0}
+.mtg .dt{text-align:center;width:54px;flex-shrink:0}
+.mtg .dt b{font-family:'Bricolage Grotesque';font-size:19px;display:block;line-height:1}
+.mtg .dt small{font-size:10.5px;color:var(--muted);text-transform:uppercase}
+.mtg .mi{flex:1}.mtg .mi b{font-size:14px;display:block}.mtg .mi small{font-size:12px;color:var(--muted)}
+.join-badge{font-size:10.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:var(--emerald-soft);color:var(--emerald);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.summary-card{padding:22px}
+.summary-card .sg{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px}
+.sblock h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:9px}
+.sblock li{list-style:none;font-size:13px;padding:6px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.4}
+.sblock li .b{color:var(--tang);font-weight:700;flex-shrink:0}
+.sblock li .g{color:var(--emerald);font-weight:700;flex-shrink:0}
+
+/* ---------- ANALYTICS ---------- */
+.an-grid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start}
+.report{padding:22px;background:linear-gradient(135deg,var(--espresso),var(--espresso-2));color:#EDE3D6;border-radius:18px}
+.report .rh{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.report .rh .s{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--tang),var(--amber));display:grid;place-items:center}
+.report .rh .s svg{width:17px;height:17px;stroke:#fff}
+.report .rh b{font-family:'Bricolage Grotesque';font-size:16px}
+.report .rh small{font-size:11px;color:#B49C84;display:block}
+.report p{font-size:13px;line-height:1.65;color:#D8C8B4;margin-bottom:12px}
+.report p b{color:var(--amber)}
+.fr{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}
+.fr:last-child{border-bottom:0}
+.fr .rank{width:28px;height:28px;border-radius:8px;background:rgba(244,98,46,.12);color:var(--tang);display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0}
+.fr .ft{flex:1}.fr .ft b{font-size:13.5px;display:block}.fr .ft small{font-size:12px;color:var(--muted)}
+.fr .time{font-family:'Space Mono';font-size:13px;font-weight:700;color:var(--rose)}
+.fr .time.ok{color:var(--emerald)}
+
+/* ---------- ONBOARDING GATE ---------- */
+body.locked{overflow:hidden}
+body.locked .wrap{display:none}
+.gate{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:24px;
+  background:
+    radial-gradient(900px 500px at 80% -5%, rgba(244,98,46,.16), transparent),
+    radial-gradient(800px 500px at -5% 100%, rgba(242,163,61,.14), transparent),
+    var(--cream);
+  background-image:radial-gradient(circle at 1px 1px, rgba(120,80,40,.05) 1px, transparent 0);background-size:22px 22px;}
+body.locked .gate{display:grid}
+.gate-split{width:100%;max-width:880px;display:grid;grid-template-columns:1fr 1fr;background:var(--paper);border:1px solid var(--line);border-radius:26px;overflow:hidden;box-shadow:var(--shadow-lg);animation:pop .5s ease both;min-height:540px}
+.gate-aside{background:linear-gradient(150deg,var(--espresso),var(--espresso-2));color:#EDE3D6;padding:34px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.ga-glow{position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(244,98,46,.45),transparent 70%);top:-100px;right:-90px;filter:blur(12px)}
+.ga-top{display:flex;align-items:center;gap:11px;position:relative}
+.ga-top .mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--tang),var(--amber));display:grid;place-items:center;font-family:'Bricolage Grotesque';font-weight:800;color:#fff;font-size:21px;box-shadow:0 6px 16px rgba(244,98,46,.45)}
+.ga-top h1{font-family:'Bricolage Grotesque';font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1;color:#fff}
+.ga-top span{font-size:10.5px;color:var(--amber);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.ga-mid{margin-top:auto;position:relative}
+.ga-foot{margin-top:28px;font-size:11.5px;color:#9C8670;position:relative}
+/* looping demo */
+.ga-demo{flex:1;display:grid;place-items:center;position:relative;margin:18px 0}
+.ga-gif{width:100%;max-width:320px;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.demo{position:relative;width:300px;height:208px}
+.frame{position:absolute;inset:0;background:var(--paper);border-radius:18px;border:1px solid rgba(255,255,255,.12);box-shadow:0 22px 55px rgba(0,0,0,.4);padding:18px;opacity:0;animation:cycle 12s infinite}
+.frame:nth-child(1){animation-delay:0s}
+.frame:nth-child(2){animation-delay:4s}
+.frame:nth-child(3){animation-delay:8s}
+@keyframes cycle{0%{opacity:0;transform:translateY(14px) scale(.96)}4%{opacity:1;transform:none}29%{opacity:1;transform:none}33%{opacity:0;transform:translateY(-14px) scale(.96)}100%{opacity:0}}
+.fr-cap{font-family:'Space Mono';font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--tang);font-weight:700;margin-bottom:12px}
+.d-search{display:flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-family:'Space Mono';font-size:12px;color:var(--ink)}
+.d-spec{display:flex;gap:12px;margin-top:14px;align-items:center}
+.d-img{width:54px;height:54px;border-radius:11px;background:linear-gradient(135deg,var(--cream-2),#E6D4BC);display:grid;place-items:center;flex-shrink:0;border:1px solid var(--line)}
+.d-l{height:9px;border-radius:5px;background:var(--cream-2);margin-bottom:7px}
+.w70{width:70%}.w55{width:55%}.w45{width:45%}.w40{width:40%}
+.d-chips{display:flex;gap:5px;margin-top:9px}
+.d-chips span{width:34px;height:14px;border-radius:5px;background:var(--emerald-soft)}
+.d-chips span:last-child{background:rgba(242,163,61,.2)}
+.d-wave{display:flex;align-items:center;gap:4px;height:40px;margin:6px 0 14px}
+.d-wave i{flex:1;background:linear-gradient(180deg,var(--tang),var(--amber));border-radius:3px;animation:wv 1s ease-in-out infinite}
+.d-wave i:nth-child(2n){animation-delay:.15s}.d-wave i:nth-child(3n){animation-delay:.3s}.d-wave i:nth-child(4n){animation-delay:.45s}
+.d-bubble{font-size:12px;background:var(--cream-2);border-radius:10px;padding:8px 11px;margin-bottom:7px;line-height:1.35;max-width:90%}
+.d-bubble.me{background:var(--emerald-soft);color:var(--emerald);margin-left:auto;text-align:right}
+.d-gauge{position:relative;width:84px;height:84px;margin:0 auto 14px}
+.d-num{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque';font-size:26px;font-weight:700}
+.d-ring{animation:fill 1.4s ease both}
+@keyframes fill{from{stroke-dashoffset:214}to{stroke-dashoffset:60}}
+/* sign-in tabs */
+.form-tabs{display:flex;gap:6px;background:var(--cream);border:1px solid var(--line);border-radius:11px;padding:4px;margin-bottom:20px}
+.ftab{flex:1;border:none;background:none;font-family:inherit;font-size:13px;font-weight:600;padding:8px;border-radius:8px;cursor:pointer;color:var(--muted);transition:.18s}
+.ftab.on{background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}
+.gate-form.signin .f-name,.gate-form.signin .f-company{display:none}
+.gate-form:not(.signin) .f-pass{display:none}
+.gate-form{padding:42px 38px;display:flex;flex-direction:column;justify-content:center}
+.gate-form h2{font-family:'Bricolage Grotesque';font-size:25px;letter-spacing:-.025em;line-height:1.1}
+.gate-form .sub{color:var(--muted);font-size:14px;margin:8px 0 22px;line-height:1.5}
+.gate-form label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--muted);display:block;margin-bottom:7px}
+.gate-form input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-family:inherit;font-size:14.5px;background:var(--cream);outline:none;transition:.2s}
+.gate-form input:focus{border-color:var(--tang);background:var(--paper)}
+.gate-form .err{color:var(--rose);font-size:12px;margin-top:9px;display:none}
+.gate-form .full{width:100%;justify-content:center;margin-top:18px;padding:13px}
+.gate-form .gdiv{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font-size:12px}
+.gate-form .gdiv::before,.gate-form .gdiv::after{content:"";flex:1;height:1px;background:var(--line)}
+.gate-form .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:12px;font-family:inherit;font-weight:600;font-size:13.5px;cursor:pointer;transition:.18s;color:var(--ink)}
+.gate-form .gbtn:hover{border-color:var(--tang);background:var(--cream)}
+.gate-form .gbtn .g{width:20px;height:20px;border-radius:5px;background:linear-gradient(135deg,var(--tang),var(--amber));display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px}
+.gate-form .fine{font-size:11.5px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.5}
+.gate-step2{display:none}
+body.connecting .gate-step1{display:none}
+body.connecting .gate-step2{display:block}
+.spin{width:38px;height:38px;border:3px solid var(--cream-2);border-top-color:var(--tang);border-radius:50%;animation:rot .8s linear infinite;margin:0 auto 18px}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ---------- TOAST ---------- */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);z-index:300;
+  background:var(--espresso);color:#F1E7DA;padding:13px 20px;border-radius:13px;font-size:13.5px;font-weight:500;
+  box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.3s;display:flex;align-items:center;gap:9px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .tk{width:8px;height:8px;border-radius:50%;background:var(--emerald)}
+
+/* ---------- POC DROP ---------- */
+.drop{border:2px dashed var(--line);border-radius:20px;padding:40px 24px;text-align:center;background:var(--paper);transition:.2s}
+.drop.over{border-color:var(--tang);background:rgba(244,98,46,.05)}
+.drop .drop-ic{width:54px;height:54px;border-radius:15px;background:rgba(244,98,46,.1);display:grid;place-items:center;margin:0 auto 16px}
+.drop .drop-ic svg{width:26px;height:26px;stroke:var(--tang)}
+.drop b{font-size:15px;display:block}
+.drop span{font-size:12.5px;color:var(--muted);display:block;margin-top:4px}
+.poc-stat{display:flex;gap:30px}
+.poc-stat b{font-family:'Bricolage Grotesque';font-size:26px;display:block;line-height:1}
+.poc-stat small{font-size:11.5px;color:var(--muted)}
+.quick button.sel{border-color:var(--tang);background:rgba(244,98,46,.07);color:var(--tang)}
+
+/* skeleton */
+.skel{background:linear-gradient(90deg,var(--cream-2) 25%,#EEE3D0 50%,var(--cream-2) 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px}
+@keyframes sk{to{background-position:-200% 0}}
+
+@media(max-width:920px){.bento{grid-template-columns:repeat(2,1fr)}.t-hero,.t-insight,.t-chart,.t-mod,.t-wide{grid-column:span 2}.chat-wrap,.audit-grid,.voice-grid,.an-grid{grid-template-columns:1fr}.summary-card .sg{grid-template-columns:1fr}.gate-aside{display:none}.gate-split{grid-template-columns:1fr;max-width:440px;min-height:auto}}
+</style>
+</head>
+<body class="locked">
+
+<!-- ONBOARDING PAGE -->
+<div class="gate">
+  <div class="gate-split">
+    <div class="gate-aside">
+      <div class="ga-glow"></div>
+      <div class="ga-top"><div class="mark">A</div><div><h1>Altius</h1><span>Sales Intel</span></div></div>
+      <!-- Looping product demo. To use your own GIF instead, replace this whole .ga-demo block with: <img src="your.gif" class="ga-gif"> -->
+      <div class="ga-demo">
+        <div class="demo">
+          <div class="frame">
+            <div class="fr-cap">Product Lookup</div>
+            <div class="d-search"><svg viewBox="0 0 24 24" width="13" fill="none" stroke="#8C7C6C" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg> 6206 bearing SKF</div>
+            <div class="d-spec"><div class="d-img"><svg viewBox="0 0 24 24" width="22" fill="none" stroke="#C9A06E" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg></div><div><div class="d-l w70"></div><div class="d-l w45" style="background:var(--tang);height:6px"></div><div class="d-chips"><span></span><span></span></div></div></div>
+          </div>
+          <div class="frame">
+            <div class="fr-cap">Voice Co-pilot</div>
+            <div class="d-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="d-bubble">"Aapke paas SKF 6206 ka stock hai?"</div>
+            <div class="d-bubble me">Yes — 200 units, ~$9.20 bulk.</div>
+          </div>
+          <div class="frame">
+            <div class="fr-cap">Site Audit</div>
+            <div class="d-gauge"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="#F3EADA" stroke-width="9"/><circle class="d-ring" cx="42" cy="42" r="34" fill="none" stroke="#D9456B" stroke-width="9" stroke-linecap="round" stroke-dasharray="214" stroke-dashoffset="60" transform="rotate(-90 42 42)"/></svg><div class="d-num">28</div></div>
+            <div class="d-l w70"></div><div class="d-l w55"></div><div class="d-l w40"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ga-foot">Trusted by sales teams enriching 2M+ SKUs</div>
+    </div>
+    <div class="gate-form">
+      <div class="gate-step1">
+        <div class="form-tabs">
+          <button class="ftab on" data-mode="signup">Create account</button>
+          <button class="ftab" data-mode="signin">Sign in</button>
+        </div>
+        <h2 id="formTitle">Create your workspace</h2>
+        <div class="sub" id="formSub">A few details and you're in. No credit card.</div>
+        <div class="f-name">
+          <label>Full name</label>
+          <input id="gname" type="text" placeholder="Riya Mehta" autocomplete="name">
+        </div>
+        <label style="margin-top:14px">Work email</label>
+        <input id="gemail" type="email" placeholder="you@company.com" autocomplete="email">
+        <div class="f-company">
+          <label style="margin-top:14px">Company <span style="text-transform:none;font-weight:500;color:var(--muted)">(optional)</span></label>
+          <input id="gcompany" type="text" placeholder="Altius" autocomplete="organization">
+        </div>
+        <div class="f-pass">
+          <label style="margin-top:14px">Password</label>
+          <input id="gpass" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="err" id="gerr">Please enter your name and a valid email.</div>
+        <button class="btn btn-primary full" id="ggo">Get started →</button>
+        <div class="gdiv">or</div>
+        <button class="gbtn" id="ggoogle"><span class="g">G</span> Continue with Google Workspace</button>
+        <div class="fine">By continuing you agree to let Altius sync your calendar & inbox. Disconnect anytime.</div>
+      </div>
+      <div class="gate-step2" style="text-align:center">
+        <div class="spin"></div>
+        <h2 id="gconn">Setting things up…</h2>
+        <div class="sub" id="gconnsub">Syncing your inbox and calendar.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="tk"></span><span id="toastmsg"></span></div>
+
+
+<div class="wrap">
+
+  <!-- FLOATING HEADER -->
+  <header class="bar">
+    <div class="brand"><div class="mark">A</div><div><h1>Altius</h1><span>Sales Intel</span></div></div>
+    <div class="cmd" onclick="go('lookup')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+      Ask Altius — "6206 bearing SKF", "distributors in Ohio"…
+      <span class="k">⌘K</span>
+    </div>
+    <div class="tb">
+      <div class="icon-btn"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+      <div class="av">RM</div>
+    </div>
+  </header>
+
+  <!-- CONTROL DECK -->
+  <nav class="deck">
+    <div class="pill active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Launchpad</div>
+    <div class="pill" data-view="lookup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg> Product Lookup</div>
+    <div class="pill" data-view="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Lead Gen</div>
+    <div class="pill" data-view="audit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg> Site Audit</div>
+    <div class="pill" data-view="comp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Competitor</div>
+    <div class="pill" data-view="poc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg> POC Gen</div>
+    <div class="pill" data-view="voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Voice</div>
+    <div class="pill" data-view="meeting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Meeting</div>
+    <div class="pill" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> Analytics</div>
+  </nav>
+
+  <!-- ========= LAUNCHPAD ========= -->
+  <section class="view show" id="home">
+    <div class="greet">
+      <div class="eyebrow" id="greetEyebrow">Thursday · good morning</div>
+      <h2 id="hello">Welcome back, <em>Riya</em></h2>
+      <p>Your AI agents ran 1,284 tasks overnight. Jump into a module, or start typing in the command bar above.</p>
+    </div>
+
+    <div class="bento">
+      <!-- hero -->
+      <div class="tile t-hero" style="animation-delay:.04s">
+        <div class="glow"></div>
+        <div><h3>Pipeline generated by AI this week</h3><div class="sub">8-week trend · +63% vs last quarter</div></div>
+        <div class="stat-row">
+          <div class="stat"><b>$192k</b><small>this week <span class="up">▲18%</span></small></div>
+          <div class="stat"><b>47</b><small>new leads</small></div>
+          <div class="stat"><b>38%</b><small>win rate <span class="up">▲6pt</span></small></div>
+        </div>
+      </div>
+
+      <!-- insight -->
+      <div class="tile t-insight" style="animation-delay:.1s">
+        <div class="spark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3 14 9l6 2-6 2-2 6-2-6-6-2 6-2z"/></svg></div>
+        <b>Shopify connector is your #1 customer ask</b>
+        <p>34 of last 50 calls requested it — ~$280k of pipeline waiting on it.</p>
+      </div>
+
+      <!-- module launchers -->
+      <div class="tile t-mod click m-tang" data-view="lookup" style="animation-delay:.14s">
+        <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></div>
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg></div>
+        <h3>Product Lookup</h3>
+        <p>Type a fragment, get full specs, images & substitutes in ~4 seconds — mid-call.</p>
+        <div class="prev"><span>SKF 6206</span><span>3M 1080</span><span>+ live pricing</span></div>
+      </div>
+
+      <div class="tile t-mod click m-emer" data-view="leads" style="animation-delay:.18s">
+        <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></div>
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+        <h3>Lead Generation</h3>
+        <p>Describe your ICP in plain English; get scored, ranked prospects.</p>
+        <div class="spark-bars"><i style="height:40%;animation-delay:.1s"></i><i style="height:65%;animation-delay:.15s"></i><i style="height:50%;animation-delay:.2s"></i><i style="height:85%;animation-delay:.25s"></i><i style="height:70%;animation-delay:.3s"></i><i style="height:95%;animation-delay:.35s"></i></div>
+      </div>
+
+      <div class="tile t-mod click m-amber" data-view="audit" style="animation-delay:.22s">
+        <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></div>
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <h3>Site Audit</h3>
+        <p>Crawl a prospect's catalog, score the gaps, send a branded PDF before the call.</p>
+        <div class="prev"><span>230 pages → 41s</span><span>Score 28/100</span></div>
+      </div>
+
+      <div class="tile t-mod click m-rose" data-view="comp" style="animation-delay:.26s">
+        <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></div>
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h3>Competitor Watch</h3>
+        <p>Nightly catalog diffs. Get alerted the moment a rival changes pricing or attributes.</p>
+        <div class="prev"><span>3 new alerts</span><span>Grainger flagged</span></div>
+      </div>
+
+      <!-- secondary row of smaller launchers -->
+      <div class="tile click m-esp" data-view="poc" style="grid-column:span 2;animation-delay:.3s">
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></div>
+        <h3>POC Generator</h3>
+      </div>
+      <div class="tile click m-esp" data-view="voice" style="grid-column:span 2;animation-delay:.34s">
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div>
+        <h3>Voice Assistant</h3>
+      </div>
+      <div class="tile click m-esp" data-view="meeting" style="grid-column:span 2;animation-delay:.38s">
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Meeting Intel</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========= PRODUCT LOOKUP ========= -->
+  <section class="view" id="lookup">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>Product Lookup</h2></div>
+    <div class="chat-wrap">
+      <div class="card chat">
+        <div class="chat-body" id="chatBody">
+          <div class="msg rep"><div class="who">You · on call with Buckeye Industrial</div><div class="bubble">6206 bearing SKF</div></div>
+          <div class="msg ai"><div class="who">Altius Agent</div><div class="bubble">Found it — full sheet 👇</div>
+            <div class="spec">
+              <div class="spec-top">
+                <div class="spec-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg></div>
+                <div><h4>SKF Deep Groove Ball Bearing</h4><div class="sku">SKF · 6206-2RS1 · 30×62×16mm</div><span class="tag iso">ISO 15:2017</span><span class="tag">In stock · 3 distributors</span></div>
+              </div>
+              <div class="spec-grid"><div><b>Bore Ø</b>30 mm</div><div><b>Outer Ø</b>62 mm</div><div><b>Dynamic load</b>20.3 kN</div><div><b>Max speed</b>9,500 rpm</div></div>
+              <div class="spec-foot"><button class="btn btn-primary">📎 Share with customer</button><button class="btn btn-ghost">3 substitutes</button><button class="btn btn-ghost">$8–14</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input"><input id="chatInput" placeholder="Type a product name, code or fragment…"><button class="btn btn-primary" id="chatSend">Send</button></div>
+      </div>
+      <div>
+        <div class="card side-card" style="margin-bottom:14px"><h3>Quick lookups</h3><div class="quick"><button>3M 1080 vinyl wrap matte black</button><button>DEWALT DCD777 drill driver</button><button>1/2" copper elbow fitting</button></div><div class="latency"><svg viewBox="0 0 24 24" width="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Avg response: 3.8 seconds</div></div>
+        <div class="card side-card"><h3>Sources searched</h3><div style="font-size:12.5px;color:var(--muted);line-height:2">✓ Knowledge bank (P2)<br>✓ Manufacturer datasheets<br>✓ Grainger / MSC pricing<br>✓ ISO / ANSI index</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========= LEAD GEN ========= -->
+  <section class="view" id="leads">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>Lead Generation</h2></div>
+    <div class="searchbar"><input value="Industrial distributors in Ohio with 500+ SKUs and no rich product data"><button class="btn btn-primary" id="findLeads" style="padding:13px 22px">⚡ Find leads</button></div>
+    <div class="card tbl"><table>
+      <thead><tr><th>Company</th><th>SKUs</th><th>Data quality</th><th>Fit</th><th>Opportunity</th><th></th></tr></thead>
+      <tbody>
+        <tr><td><div class="co"><div class="logo" style="background:#F4622E">BI</div><div><b>Buckeye Industrial</b><small>buckeyeind.com · Columbus</small></div></div></td><td><b>1,840</b></td><td><span class="opp med">Thin · 22%</span></td><td><div class="score"><div class="ring" style="background:#1E7A55">94</div></div></td><td><span class="opp high">High · $48k</span></td><td><button class="btn btn-ghost">+ CRM</button></td></tr>
+        <tr><td><div class="co"><div class="logo" style="background:#1E7A55">MR</div><div><b>Midwest Roofing Supply</b><small>mwroofing.com · Akron</small></div></div></td><td><b>920</b></td><td><span class="opp med">Thin · 31%</span></td><td><div class="score"><div class="ring" style="background:#1E7A55">88</div></div></td><td><span class="opp high">High · $34k</span></td><td><button class="btn btn-ghost">+ CRM</button></td></tr>
+        <tr><td><div class="co"><div class="logo" style="background:#F2A33D">CV</div><div><b>Cardinal Valve & Fitting</b><small>cardinalvf.com · Dayton</small></div></div></td><td><b>2,310</b></td><td><span class="opp med">Partial · 44%</span></td><td><div class="score"><div class="ring" style="background:#F2A33D">81</div></div></td><td><span class="opp high">High · $29k</span></td><td><button class="btn btn-ghost">+ CRM</button></td></tr>
+        <tr><td><div class="co"><div class="logo" style="background:#D9456B">OT</div><div><b>Ohio Tool & Fastener</b><small>ohiotool.com · Toledo</small></div></div></td><td><b>670</b></td><td><span class="opp med">Thin · 19%</span></td><td><div class="score"><div class="ring" style="background:#F2A33D">76</div></div></td><td><span class="opp med">Med · $18k</span></td><td><button class="btn btn-ghost">+ CRM</button></td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:14px;color:var(--muted);font-size:13px">Top 4 of <b style="color:var(--tang)">47 companies</b> found · scored on site quality, SKU count, data gaps & buying signals.</p>
+  </section>
+
+  <!-- ========= SITE AUDIT ========= -->
+  <section class="view" id="audit">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>Site Audit</h2></div>
+    <div class="searchbar"><input value="https://acmeplumbing.com"><button class="btn btn-primary" id="runAudit" style="padding:13px 22px">🔎 Run audit</button></div>
+    <div class="audit-grid">
+      <div class="card gauge-card">
+        <div class="gauge"><svg width="170" height="170" viewBox="0 0 170 170"><circle cx="85" cy="85" r="73" fill="none" stroke="#F3EADA" stroke-width="15"/><circle id="gaugeRing" cx="85" cy="85" r="73" fill="none" stroke="#D9456B" stroke-width="15" stroke-linecap="round" stroke-dasharray="458" stroke-dashoffset="330"/></svg><div class="num"><b id="gaugeNum">28</b><small>/100 · Poor</small></div></div>
+        <div class="opp high" style="font-size:13px;padding:7px 16px">Opportunity: High</div>
+        <p style="color:var(--muted);font-size:13px;margin-top:14px;line-height:1.6">230 product pages crawled in 41 seconds. 6 critical gaps.</p>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:14px">📄 Generate PDF audit</button>
+      </div>
+      <div class="card" style="padding:22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="font-family:'Bricolage Grotesque';font-size:17px">Gap analysis</h3><span class="chip-flag">230 pages</span></div>
+        <div class="gap-row"><div class="gi" style="background:rgba(217,69,107,.12);color:var(--rose)">✕</div><div class="gt"><b>Feature bullets</b><small>0% of pages have structured feature lists</small></div><div class="gbar"><i style="width:2%;background:var(--rose)"></i></div><div class="gpct" style="color:var(--rose)">0%</div></div>
+        <div class="gap-row"><div class="gi" style="background:rgba(242,163,61,.16);color:#B5740F">!</div><div class="gt"><b>Product images</b><small>34% of SKUs have no image</small></div><div class="gbar"><i style="width:66%;background:var(--amber)"></i></div><div class="gpct" style="color:#B5740F">66%</div></div>
+        <div class="gap-row"><div class="gi" style="background:rgba(217,69,107,.12);color:var(--rose)">✕</div><div class="gt"><b>Description depth</b><small>67% under 50 words</small></div><div class="gbar"><i style="width:33%;background:var(--rose)"></i></div><div class="gpct" style="color:var(--rose)">33%</div></div>
+        <div class="gap-row"><div class="gi" style="background:rgba(217,69,107,.12);color:var(--rose)">✕</div><div class="gt"><b>Faceted search</b><small>No filters by attribute or spec</small></div><div class="gbar"><i style="width:2%;background:var(--rose)"></i></div><div class="gpct" style="color:var(--rose)">None</div></div>
+        <div class="gap-row"><div class="gi" style="background:var(--emerald-soft);color:var(--emerald)">✓</div><div class="gt"><b>Mobile responsive</b><small>Renders correctly on mobile</small></div><div class="gbar"><i style="width:100%;background:var(--emerald)"></i></div><div class="gpct" style="color:var(--emerald)">100%</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========= COMPETITOR ========= -->
+  <section class="view" id="comp">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>Competitor Watch</h2></div>
+    <div class="alert hot"><div class="al-ic" style="background:#F4622E">G</div><div class="al-body"><div class="meta"><b>Grainger — Drill Bits</b><span class="chip-flag">New attribute</span><span class="when">Nov 15, 2:14am</span></div><p>Added a <b>Country of Origin</b> attribute across <b>1,200 SKUs</b>. Your catalog doesn't populate this — recommend re-enrichment to stay at parity.</p><div class="diff"><div class="ctx">  attributes = { brand, size, material … }</div><div class="add">+ country_of_origin: "USA" — 1,200 SKUs</div></div><button class="btn btn-primary" style="margin-top:12px">⚡ Trigger re-enrichment</button></div></div>
+    <div class="alert"><div class="al-ic" style="background:#1E7A55">M</div><div class="al-body"><div class="meta"><b>MSC Industrial — Cutting Tools</b><span class="chip-flag">Price drop</span><span class="when">Nov 14</span></div><p>Average price down <b>6.4%</b> across 340 carbide end mills. Two shared accounts buy here.</p><div class="diff"><div class="ctx">  was: $42.10 avg</div><div class="add">→ now: $39.40 avg (−6.4%)</div></div></div></div>
+    <div class="alert"><div class="al-ic" style="background:#F2A33D">F</div><div class="al-body"><div class="meta"><b>Fastenal — Safety</b><span class="chip-flag">142 new SKUs</span><span class="when">Nov 13</span></div><p>Expanded into <b>fall-protection harnesses</b> — a category you don't list. Whitespace flagged for product team.</p></div></div>
+  </section>
+
+  <!-- ========= PLACEHOLDERS ========= -->
+  <section class="view" id="poc">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>POC Generator</h2></div>
+    <div class="voice-grid">
+      <div>
+        <div class="drop" id="drop">
+          <div class="drop-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></div>
+          <b>Drop a CSV of 10–15 sample SKUs</b>
+          <span>or paste the SKUs a prospect emailed you</span>
+          <button class="btn btn-primary" id="pocRun" style="margin-top:14px">⚡ Enrich sample</button>
+        </div>
+        <div class="card" id="pocResult" style="display:none;padding:22px;margin-top:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-family:'Bricolage Grotesque';font-size:17px">Enriched — Midwest Roofing Supply</h3><span class="opp high" style="font-size:12px;padding:5px 12px">94% fill rate</span></div>
+          <div class="poc-stat"><div><b id="pocCount">12</b><small>SKUs enriched</small></div><div><b>3</b><small>images each</small></div><div><b id="pocTime">22m</b><small>turnaround</small></div></div>
+          <div class="latency" style="margin-top:16px"><svg viewBox="0 0 24 24" width="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Shopify-ready CSV generated · demo link live</div>
+          <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-primary" onclick="toast('Demo link copied to clipboard')">🔗 Copy demo link</button><button class="btn btn-ghost" onclick="toast('CSV downloaded')">⬇ Shopify CSV</button></div>
+        </div>
+      </div>
+      <div class="card side-card">
+        <h3>Output format</h3>
+        <div class="quick"><button onclick="this.closest('.side-card').querySelectorAll('button').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')" class="sel">Shopify CSV</button><button onclick="this.closest('.side-card').querySelectorAll('button').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">WooCommerce XML</button><button onclick="this.closest('.side-card').querySelectorAll('button').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">Custom JSON</button></div>
+        <div class="latency" style="margin-top:16px"><svg viewBox="0 0 24 24" width="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Avg turnaround: under 30 min</div>
+      </div>
+    </div>
+  </section>
+  <section class="view" id="voice">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>Voice</h2></div>
+
+    <div class="calltypes">
+      <div class="ct on"><div class="ct-ic" style="background:rgba(244,98,46,.12);color:var(--tang)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg></div><b>Outbound · Interest</b><small>Cold & warm prospecting</small></div>
+      <div class="ct"><div class="ct-ic" style="background:var(--emerald-soft);color:var(--emerald)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/><path d="M12 7v5l3 2"/></svg></div><b>Follow-up</b><small>Re-engage open deals</small></div>
+      <div class="ct"><div class="ct-ic" style="background:rgba(242,163,61,.16);color:#C97E16"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><b>Inbound · Support</b><small>IVR + live specs</small></div>
+    </div>
+
+    <div class="voice-grid">
+      <div class="card stage">
+        <div class="stage-head">
+          <span class="live-dot"></span>
+          <div class="cn"><b>Rohan Sharma · Cardinal Valve & Fitting</b><small>Outbound interest call · Dayton</small></div>
+          <span class="lang-pill">🌐 EN <span class="sw">⇄</span> हिंदी</span>
+          <span class="timer" id="callTimer">02:41</span>
+        </div>
+        <div class="wave"><i style="height:14px;animation-delay:0s"></i><i style="height:22px;animation-delay:.1s"></i><i style="height:8px;animation-delay:.2s"></i><i style="height:26px;animation-delay:.3s"></i><i style="height:16px;animation-delay:.15s"></i><i style="height:24px;animation-delay:.25s"></i><i style="height:10px;animation-delay:.35s"></i><i style="height:20px;animation-delay:.05s"></i><i style="height:14px;animation-delay:.2s"></i><i style="height:28px;animation-delay:.3s"></i><i style="height:12px;animation-delay:.1s"></i><i style="height:22px;animation-delay:.25s"></i></div>
+        <div class="transcript">
+          <div class="turn cust"><div class="lbl">🧑 Rohan (Customer)</div><div class="txt">Haan ji, humein 6206 bearing chahiye tha — matlab around 200 units. Aapke paas SKF ka stock hai?</div></div>
+          <div class="turn rep"><div class="lbl">🎧 You (<span class="uname">Riya</span>)</div><div class="txt">Yes, we carry SKF 6206 — let me confirm the variant and pricing for 200 units.</div></div>
+          <div class="ai-surface"><div class="s2"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3 14 9l6 2-6 2-2 6-2-6-6-2 6-2z"/></svg></div><div><b>Surfaced:</b> SKF 6206-2RS1 · in stock, 3 distributors · price $8–14/unit · bulk break at 200+ → ~$9.20. <b>Suggested:</b> mention 5-day lead time.</div></div>
+        </div>
+        <div class="stage-foot">
+          <span class="stack-badge">Telephony · Exotel</span>
+          <span class="stack-badge">STT · Sarvam Saarika</span>
+          <span class="stack-badge">TTS · Sarvam Bulbul</span>
+          <span class="stack-badge">Orchestration · Bolna</span>
+          <button class="btn btn-primary" id="endCall" style="margin-left:auto">End &amp; log outcome</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card side-card" style="margin-bottom:14px">
+          <h3>Client details</h3>
+          <div class="field"><label>Contact</label><b>Rohan Sharma · Purchasing Mgr</b></div>
+          <div class="field"><label>Company</label><b>Cardinal Valve & Fitting</b></div>
+          <div class="field"><label>Last interaction</label><b>Site audit opened 2× · 4 days ago</b></div>
+          <div class="field"><label>Deal stage · Qualification</label><div class="dealbar"><i style="width:45%"></i></div></div>
+        </div>
+        <div class="card side-card">
+          <h3>Call objective</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.5">Gauge interest in full-catalog enrichment after the audit. Book a POC if warm.</p>
+          <div class="nextline">
+            <div class="h"><svg viewBox="0 0 24 24" width="13" fill="none" stroke="var(--tang)" stroke-width="2"><path d="M12 3 14 9l6 2-6 2-2 6-2-6-6-2 6-2z"/></svg> Suggested next line</div>
+            <p>"Since your audit flagged 34% missing images — we can enrich a 12-SKU sample in under 30 minutes. Bhej dein toh aaj hi demo ready?"</p>
+          </div>
+          <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:12px">📅 Schedule follow-up call</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="view" id="meeting">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>Meetings</h2></div>
+
+    <div class="connect-row">
+      <div class="acc"><div class="glyph" style="background:#D9456B">M</div><div><b>Gmail · <span id="gmailAcc">riya@altius.io</span></b><small>Connected · reads invites</small></div><div class="toggle"><i></i></div></div>
+      <div class="acc"><div class="glyph" style="background:#F2A33D">C</div><div><b>Google Calendar</b><small>Synced · auto-join on</small></div><div class="toggle"><i></i></div></div>
+      <div class="acc"><div class="glyph" style="background:#1E7A55">Z</div><div><b>Zoom / Meet</b><small class="off">Notetaker ready</small></div><div class="toggle off"><i></i></div></div>
+    </div>
+
+    <div class="card side-card" style="padding:22px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="font-family:'Bricolage Grotesque';font-size:17px">Upcoming — notetaker will attend</h3><span class="chip-flag">pulled from Gmail</span></div>
+      <div class="mtg"><div class="dt"><b>2:00</b><small>PM</small></div><div class="mi"><b>Buckeye Industrial — Demo</b><small>Google Meet · 3 attendees · enrichment walkthrough</small></div><div class="join-badge">● Auto-join</div></div>
+      <div class="mtg"><div class="dt"><b>4:30</b><small>PM</small></div><div class="mi"><b>Midwest Roofing — Follow-up</b><small>Zoom · POC review</small></div><div class="join-badge">● Auto-join</div></div>
+      <div class="mtg"><div class="dt"><b>Wed</b><small>11AM</small></div><div class="mi"><b>Cardinal Valve — Discovery</b><small>Google Meet · pricing</small></div><div class="join-badge">● Auto-join</div></div>
+    </div>
+
+    <div class="card summary-card" style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-family:'Bricolage Grotesque';font-size:17px">Last meeting · Buckeye Industrial (yesterday)</h3><button class="btn btn-ghost">Sync to CRM</button></div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px">42-min call summarised. Buyer is comparing Altius against an in-house enrichment effort; price-sensitive but impressed by audit turnaround.</p>
+      <div class="sg">
+        <div class="sblock"><h4>Pain points</h4>
+          <li><span class="b">▸</span> 34% of catalog has no images — losing search traffic</li>
+          <li><span class="b">▸</span> Manual enrichment takes 3 staff, 2 weeks per batch</li>
+          <li><span class="b">▸</span> No Shopify-ready export today</li>
+        </div>
+        <div class="sblock"><h4>Feature requests & actions</h4>
+          <li><span class="g">✓</span> Shopify connector (deal-blocker)</li>
+          <li><span class="g">✓</span> Bulk image download</li>
+          <li><span class="g">✓</span> Send 12-SKU POC by Friday — <b>owner: <span class="uname">Riya</span></b></li>
+        </div>
+      </div>
+    </div>
+
+    <div class="card side-card" style="padding:22px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="font-family:'Bricolage Grotesque';font-size:17px">Customer wishlist — across last 50 calls</h3><span class="chip-flag">auto-prioritised roadmap</span></div>
+      <div class="gap-row"><div class="gt"><b>Shopify connector</b><small>requested by 34 customers</small></div><div class="gbar" style="width:160px"><i style="width:100%;background:var(--tang)"></i></div><div class="gpct" style="color:var(--tang)">34</div></div>
+      <div class="gap-row"><div class="gt"><b>Bulk image download</b><small>requested by 28 customers</small></div><div class="gbar" style="width:160px"><i style="width:82%;background:var(--amber)"></i></div><div class="gpct" style="color:#B5740F">28</div></div>
+      <div class="gap-row"><div class="gt"><b>Multi-language descriptions</b><small>requested by 19 customers</small></div><div class="gbar" style="width:160px"><i style="width:56%;background:var(--emerald)"></i></div><div class="gpct" style="color:var(--emerald)">19</div></div>
+    </div>
+  </section>
+  <section class="view" id="analytics">
+    <button class="btn-back" onclick="go('home')">← Launchpad</button>
+    <div class="page-head"><h2>Analytics</h2></div>
+
+    <div class="an-grid">
+      <div>
+        <div class="report" style="margin-bottom:18px">
+          <div class="rh"><div class="s"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3 14 9l6 2-6 2-2 6-2-6-6-2 6-2z"/></svg></div><div><b>This week's report</b><small>Written by Claude · Nov 18</small></div></div>
+          <p>Reps spent an average of <b>8 minutes</b> on the column-mapping step — it should take ~2. <b>67%</b> re-mapped at least 3 columns, suggesting the auto-suggest is mis-matching common headers like "MPN" and "Mfr Part #".</p>
+          <p>The Product Lookup module drove the most engagement (<b>1,840 sessions</b>), while POC Generator has a <b>22% drop-off</b> at file upload — likely a format-validation issue.</p>
+          <p style="margin-bottom:0"><b>Top recommendation:</b> improve header auto-match accuracy and add a sample-file template to the POC uploader. Est. impact: −5 min per onboarding.</p>
+        </div>
+        <div class="card side-card" style="padding:22px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="font-family:'Bricolage Grotesque';font-size:17px">Top friction points</h3><span class="chip-flag">this week</span></div>
+          <div class="fr"><div class="rank">1</div><div class="ft"><b>Column mapping</b><small>Target 2 min · 67% re-map 3+ columns</small></div><div class="time">8m 04s</div></div>
+          <div class="fr"><div class="rank">2</div><div class="ft"><b>POC file upload</b><small>22% drop-off · format errors</small></div><div class="time">drop-off</div></div>
+          <div class="fr"><div class="rank">3</div><div class="ft"><b>Lead export to CRM</b><small>Works smoothly, fast path</small></div><div class="time ok">0m 18s</div></div>
+        </div>
+      </div>
+
+      <div class="card side-card" style="padding:22px">
+        <h3 style="font-family:'Bricolage Grotesque';font-size:17px;margin-bottom:16px">Sessions by module</h3>
+        <div class="gap-row"><div class="gt"><b>Product Lookup</b></div><div class="gbar" style="width:120px"><i style="width:100%;background:var(--tang)"></i></div><div class="gpct" style="color:var(--tang)">1,840</div></div>
+        <div class="gap-row"><div class="gt"><b>Site Audit</b></div><div class="gbar" style="width:120px"><i style="width:64%;background:var(--amber)"></i></div><div class="gpct" style="color:#B5740F">1,180</div></div>
+        <div class="gap-row"><div class="gt"><b>Lead Gen</b></div><div class="gbar" style="width:120px"><i style="width:48%;background:var(--emerald)"></i></div><div class="gpct" style="color:var(--emerald)">890</div></div>
+        <div class="gap-row"><div class="gt"><b>Voice Cockpit</b></div><div class="gbar" style="width:120px"><i style="width:33%;background:var(--rose)"></i></div><div class="gpct" style="color:var(--rose)">610</div></div>
+        <div class="gap-row"><div class="gt"><b>POC Generator</b></div><div class="gbar" style="width:120px"><i style="width:18%;background:var(--espresso)"></i></div><div class="gpct">320</div></div>
+        <div class="latency" style="margin-top:16px"><svg viewBox="0 0 24 24" width="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m22 4-10 10.01-3-3"/></svg> 4,920 total sessions · ▲ 19% WoW</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const pills=document.querySelectorAll('.pill');
+const views=document.querySelectorAll('.view');
+function go(v){
+  pills.forEach(p=>p.classList.toggle('active',p.dataset.view===v));
+  views.forEach(s=>s.classList.toggle('show',s.id===v));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+pills.forEach(p=>p.addEventListener('click',()=>go(p.dataset.view)));
+document.querySelectorAll('.tile.click').forEach(t=>t.addEventListener('click',()=>go(t.dataset.view)));
+
+/* ---- toast ---- */
+let toastT;
+function toast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastmsg').textContent=msg;
+  t.classList.add('show');clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ---- onboarding ---- */
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase()}
+function login(name,email,company){
+  const parts=name.trim().split(/\s+/);
+  const first=cap(parts[0]||'there');
+  const initials=((parts[0]?parts[0][0]:'A')+(parts[1]?parts[1][0]:'')).toUpperCase();
+  const hr=new Date().getHours();
+  const tod=hr<12?'good morning':hr<17?'good afternoon':'good evening';
+  const day=new Date().toLocaleDateString('en-US',{weekday:'long'});
+  document.body.classList.add('connecting');
+  document.getElementById('gconnsub').textContent='Syncing '+(email||'your workspace')+'…';
+  setTimeout(()=>{
+    document.body.classList.remove('locked','connecting');
+    document.querySelector('.av').textContent=initials;
+    document.getElementById('greetEyebrow').textContent=day+' · '+tod;
+    document.getElementById('hello').innerHTML='Welcome back, <em>'+first+'</em>';
+    if(email)document.getElementById('gmailAcc').textContent=email;
+    document.querySelectorAll('.uname').forEach(e=>e.textContent=first);
+    toast('Workspace ready · welcome, '+first);
+  },1600);
+}
+document.getElementById('ggo').addEventListener('click',()=>{
+  const form=document.querySelector('.gate-form');
+  const signin=form.classList.contains('signin');
+  const name=document.getElementById('gname').value.trim();
+  const email=document.getElementById('gemail').value.trim();
+  const company=document.getElementById('gcompany').value.trim();
+  const pass=document.getElementById('gpass').value;
+  const okEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  let ok, derived=name;
+  if(signin){
+    ok=okEmail && pass.length>0;
+    derived=name||cap((email.split('@')[0]||'there').replace(/[._]/g,' ').split(' ')[0]);
+    document.getElementById('gerr').textContent='Enter your email and password.';
+  }else{
+    ok=name.length>1 && okEmail;
+    document.getElementById('gerr').textContent='Please enter your name and a valid email.';
+  }
+  document.getElementById('gerr').style.display=ok?'none':'block';
+  if(ok)login(derived,email,company);
+});
+['gname','gemail','gcompany','gpass'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('ggo').click()}));
+document.getElementById('ggoogle').addEventListener('click',()=>{
+  const name=document.getElementById('gname').value.trim();
+  login(name||'Riya Mehta', name?'':'riya@altius.io', '');
+});
+/* mode tabs */
+document.querySelectorAll('.ftab').forEach(tab=>tab.addEventListener('click',()=>{
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));
+  tab.classList.add('on');
+  const signin=tab.dataset.mode==='signin';
+  document.querySelector('.gate-form').classList.toggle('signin',signin);
+  document.getElementById('formTitle').textContent=signin?'Welcome back':'Create your workspace';
+  document.getElementById('formSub').textContent=signin?'Sign in to your Altius workspace.':"A few details and you're in. No credit card.";
+  document.getElementById('ggo').textContent=signin?'Sign in →':'Get started →';
+}));
+
+/* ---- toggles ---- */
+document.querySelectorAll('.toggle').forEach(t=>t.addEventListener('click',()=>{
+  t.classList.toggle('off');
+  const lbl=t.parentElement.querySelector('small');
+  if(lbl){const on=!t.classList.contains('off');lbl.classList.toggle('off',!on);lbl.textContent=on?'Connected · auto-join on':'Disconnected';}
+  toast(t.classList.contains('off')?'Disconnected':'Connected');
+}));
+
+/* ---- product lookup chat ---- */
+const KB={
+ '6206':{n:'SKF Deep Groove Ball Bearing',sku:'SKF · 6206-2RS1 · 30×62×16mm',g:[['Bore Ø','30 mm'],['Outer Ø','62 mm'],['Dynamic load','20.3 kN'],['Max speed','9,500 rpm']],iso:'ISO 15:2017',price:'$8–14'},
+ '1080':{n:'3M 1080 Vinyl Wrap — Matte Black',sku:'3M · 1080-M12 · 5ft roll',g:[['Finish','Matte'],['Coverage','25 ft²'],['Cast film','2 mil'],['Warranty','7 yr']],iso:'PVC cast',price:'$4.20/ft'},
+ 'dcd777':{n:'DEWALT 20V Brushless Drill Driver',sku:'DEWALT · DCD777C2',g:[['Voltage','20V MAX'],['Torque','340 UWO'],['Chuck','1/2 in'],['Weight','2.6 lb']],iso:'—',price:'$99–129'},
+ 'copper':{n:'1/2" Copper 90° Elbow Fitting',sku:'NIBCO · C-606 · 1/2in',g:[['Type','Sweat × Sweat'],['Material','C12200'],['Pressure','700 psi'],['Std','ASME B16.22']],iso:'ASME B16.22',price:'$0.85'},
+};
+function specCard(p){
+  return `<div class="spec"><div class="spec-top"><div class="spec-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg></div><div><h4>${p.n}</h4><div class="sku">${p.sku}</div><span class="tag iso">${p.iso}</span><span class="tag">In stock</span></div></div><div class="spec-grid">${p.g.map(x=>`<div><b>${x[0]}</b>${x[1]}</div>`).join('')}</div><div class="spec-foot"><button class="btn btn-primary" onclick="toast('Link shared with customer')">📎 Share</button><button class="btn btn-ghost">Substitutes</button><button class="btn btn-ghost">${p.price}</button></div></div>`;
+}
+function lookupMatch(q){
+  q=q.toLowerCase();
+  for(const k in KB){if(q.includes(k))return KB[k];}
+  return null;
+}
+function sendLookup(q){
+  const body=document.getElementById('chatBody');
+  body.insertAdjacentHTML('beforeend',`<div class="msg rep"><div class="who">You</div><div class="bubble">${q.replace(/</g,'&lt;')}</div></div>`);
+  body.scrollTop=body.scrollHeight;
+  const typing=document.createElement('div');
+  typing.className='msg ai';typing.innerHTML='<div class="who">Altius Agent</div><div class="bubble">Searching…</div>';
+  body.appendChild(typing);body.scrollTop=body.scrollHeight;
+  setTimeout(()=>{
+    const p=lookupMatch(q);
+    typing.innerHTML='<div class="who">Altius Agent</div><div class="bubble">'+(p?'Found it — full sheet 👇':"I couldn't match that exactly. Try a product code like \"6206\" or \"3M 1080\".")+'</div>'+(p?specCard(p):'');
+    body.scrollTop=body.scrollHeight;
+  },650);
+}
+const ci=document.getElementById('chatInput');
+if(ci){
+  document.getElementById('chatSend').addEventListener('click',()=>{if(ci.value.trim()){sendLookup(ci.value.trim());ci.value='';}});
+  ci.addEventListener('keydown',e=>{if(e.key==='Enter'&&ci.value.trim()){sendLookup(ci.value.trim());ci.value='';}});
+  document.querySelectorAll('#lookup .quick button').forEach(b=>b.addEventListener('click',()=>{ci.value=b.textContent;ci.focus();}));
+}
+
+/* ---- lead gen search ---- */
+const findBtn=document.getElementById('findLeads');
+if(findBtn){
+  const tbody=document.querySelector('#leads tbody');
+  const original=tbody.innerHTML;
+  findBtn.addEventListener('click',()=>{
+    tbody.innerHTML=Array(4).fill('<tr><td colspan="6"><div class="skel" style="height:34px"></div></td></tr>').join('');
+    setTimeout(()=>{tbody.innerHTML=original;bindCRM();toast('47 companies found');},900);
+  });
+}
+function bindCRM(){document.querySelectorAll('#leads .btn-ghost').forEach(b=>b.onclick=()=>{b.textContent='✓ Added';b.style.color='var(--emerald)';toast('Added to CRM');});}
+bindCRM();
+
+/* ---- site audit gauge ---- */
+const auditBtn=document.getElementById('runAudit');
+if(auditBtn){
+  const ring=document.getElementById('gaugeRing');
+  const num=document.getElementById('gaugeNum');
+  const TOTAL=458, SCORE=28;
+  auditBtn.addEventListener('click',()=>{
+    ring.style.transition='none';ring.style.strokeDashoffset=TOTAL;num.textContent='0';
+    requestAnimationFrame(()=>{
+      ring.style.transition='stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)';
+      ring.style.strokeDashoffset=TOTAL-(TOTAL*SCORE/100);
+      let n=0;const iv=setInterval(()=>{n++;num.textContent=n;if(n>=SCORE)clearInterval(iv);},48);
+    });
+    toast('230 pages crawled in 41s');
+  });
+}
+
+/* ---- voice call ---- */
+const endBtn=document.getElementById('endCall');
+if(endBtn){
+  let sec=161,timerIv;
+  const tEl=document.getElementById('callTimer');
+  function tick(){sec++;const m=String(Math.floor(sec/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');tEl.textContent=m+':'+s;}
+  timerIv=setInterval(tick,1000);
+  endBtn.addEventListener('click',()=>{clearInterval(timerIv);toast('Call logged · follow-up scheduled');});
+  document.querySelectorAll('.ct').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.ct').forEach(x=>x.classList.remove('on'));c.classList.add('on');}));
+}
+
+/* ---- POC ---- */
+const pocRun=document.getElementById('pocRun');
+if(pocRun){
+  const drop=document.getElementById('drop');
+  ['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over');if(e==='drop')runPoc();}));
+  pocRun.addEventListener('click',runPoc);
+  function runPoc(){
+    pocRun.textContent='Enriching…';pocRun.disabled=true;
+    setTimeout(()=>{document.getElementById('pocResult').style.display='block';pocRun.textContent='⚡ Enrich sample';pocRun.disabled=false;document.getElementById('pocResult').scrollIntoView({behavior:'smooth',block:'nearest'});toast('12 SKUs enriched · 94% fill rate');},1300);
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "name": "altius-demo",
+  "scripts": { "start": "serve -s . -l $PORT" },
+  "dependencies": { "serve": "^14" }
+}
